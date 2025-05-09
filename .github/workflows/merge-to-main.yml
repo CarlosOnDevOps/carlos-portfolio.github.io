@@ -1,44 +1,73 @@
-name: Merge to main workflows
+name: Deploy to GitHub Pages
 
-# run when a commit is pushed to "source" branch
 on:
   push:
-    branches:
-    - main
+    branches: [ "main" ]
 
 jobs:
-  deploy-to-gh-pages:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-    # checkout to the commit that has been pushed
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Required for Hugo themes
 
-    - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v3.0.0
-      with:
-        hugo-version: 'latest'
-        extended: true
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: true
 
-    - name: Update Hugo Modules
-      run: hugo mod tidy
+      - name: Build
+        run: hugo --minify --destination ./docs  # Builds into /docs folder
 
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs  # Publishes from /docs
 
-    - name: Install node modules
-      run: |
-        hugo mod npm pack
-        npm install
+# name: Merge to main workflows
 
-    - name: Build
-      run: hugo --minify
+# # run when a commit is pushed to "source" branch
+# on:
+#   push:
+#     branches:
+#     - main
 
-    # push the generated content into the `gh-pages` branch.
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v4.0.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: gh-pages
-        publish_dir: ./public
+# jobs:
+#   deploy-to-gh-pages:
+#     runs-on: ubuntu-latest
+#     steps:
+#     # checkout to the commit that has been pushed
+#     - uses: actions/checkout@v4
+
+#     - name: Setup Hugo
+#       uses: peaceiris/actions-hugo@v3.0.0
+#       with:
+#         hugo-version: 'latest'
+#         extended: true
+
+#     - name: Update Hugo Modules
+#       run: hugo mod tidy
+
+#     - name: Setup Node
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: 18
+
+#     - name: Install node modules
+#       run: |
+#         hugo mod npm pack
+#         npm install
+
+#     - name: Build
+#       run: hugo --minify
+
+#     # push the generated content into the `gh-pages` branch.
+#     - name: Deploy
+#       uses: peaceiris/actions-gh-pages@v4.0.0
+#       with:
+#         github_token: ${{ secrets.GITHUB_TOKEN }}
+#         publish_branch: gh-pages
+#         publish_dir: ./public
