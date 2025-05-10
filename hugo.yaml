@@ -1,4 +1,5 @@
-baseURL: https://hugo-toha.github.io
+# IMPORTANT! When you are ready to publish your site to Github Pages, update this URL to your repo name
+baseURL: https://carlos-portfolio.github.io #https://hugo-toha.github.io
 
 languageCode: bn
 title: "Join the Query"
